@@ -1,16 +1,10 @@
-# dex_reader
+# Dex Reader
 
-A new Flutter project.
+Basic MangaDex reader built on the new MangaDex v5 api with Flutter.
 
-## Getting Started
+Note: Both this app and the api it is built on are pretty buggy and are liable to break without warning.
 
-This project is a starting point for a Flutter application.
+To build: Make sure you have flutter >v2 sdk and the Android sdk installed.
+Download this repository, and run the build command with `flutter build apk`.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Unfortunately because of CORS this won't work as a web app without some more tweaking :(.
