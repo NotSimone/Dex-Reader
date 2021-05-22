@@ -1,13 +1,20 @@
 import "dart:convert";
-import 'package:flutter/material.dart';
+import "package:flutter/material.dart";
 import "package:http/http.dart" as http;
+import "package:flutter/foundation.dart" show kIsWeb;
 
 String baseURL = "api.mangadex.org";
 
 // Search for manga
 Future<List<MangaInfo>> searchManga(String title) async {
   final queryParameters = {"title": title, "order[updatedAt]": "desc", "limit": "100"};
-  final http.Response response = await http.get(Uri.https(baseURL, "/manga", queryParameters));
+
+  // Web requests need to go through a CORS proxy
+  Uri url = Uri.https(baseURL, "/manga", queryParameters);
+  if (kIsWeb) url = Uri.https("cors.simonliveshere.workers.dev", "/proxy", {"url": url.toString()});
+
+  final http.Response response = await http.get(url, headers: {"Access-Control-Allow-Origin": "*"});
+
   if (response.statusCode == 200) {
     List<dynamic> responseList = json.decode(response.body)["results"];
 
@@ -41,7 +48,11 @@ class MangaInfo {
 // List of chapters in a manga
 Future<Chapters> getChapters(String mangaId, int offset) async {
   final queryParameters = {"order[chapter]": "desc", "order[volume]": "desc", "limit": "10", "locales[]": "en", "offset": (offset * 10).toString()};
-  final http.Response response = await http.get(Uri.https(baseURL, "/manga/$mangaId/feed", queryParameters));
+  Uri url = Uri.https(baseURL, "/manga/$mangaId/feed", queryParameters);
+  // Web requests need to go through a CORS proxy
+  if (kIsWeb) url = Uri.https("cors.simonliveshere.workers.dev", "/proxy", {"url": url.toString()});
+  final http.Response response = await http.get(url, headers: {"Access-Control-Allow-Origin": "*"});
+
   if (response.statusCode == 200) {
     var responseData = json.decode(response.body);
     List<dynamic> responseList = responseData["results"];
@@ -94,7 +105,11 @@ class ChapterInfo {
 
 // Get mangadex@home url
 Future<void> getChapterURL(ChapterInfo chapterInfo) async {
-  final http.Response response = await http.get(Uri.https(baseURL, "/at-home/server/${chapterInfo.chapterId}"));
+  Uri url = Uri.https(baseURL, "/at-home/server/${chapterInfo.chapterId}");
+  // Web requests need to go through a CORS proxy
+  if (kIsWeb) url = Uri.https("cors.simonliveshere.workers.dev", "/proxy", {"url": url.toString()});
+  final http.Response response = await http.get(url, headers: {"Access-Control-Allow-Origin": "*"});
+
   if (response.statusCode == 200) {
     var responseData = json.decode(response.body);
 
@@ -111,5 +126,10 @@ NetworkImage getPage(ChapterInfo chapterInfo, bool highQuality, int page) {
 
   if (chapterInfo.url == "") throw Exception("Uninitialised chapter url endpoint");
 
-  return NetworkImage("${chapterInfo.url}/${highQuality ? "data" : "data-saver"}/${chapterInfo.hash}/${highQuality ? chapterInfo.images[page] : chapterInfo.saverImages[page]}");
+  String url = "${chapterInfo.url}/${highQuality ? "data" : "data-saver"}/${chapterInfo.hash}/${highQuality ? chapterInfo.images[page] : chapterInfo.saverImages[page]}";
+
+  // Web requests need to go through a CORS proxy
+  if (kIsWeb) url = "https://cors.simonliveshere.workers.dev/proxy/?url=" + url;
+
+  return NetworkImage(url, headers: {"Access-Control-Allow-Origin": "*"});
 }
