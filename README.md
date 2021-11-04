@@ -1,8 +1,8 @@
 # Dex Reader
 
-Basic MangaDex reader built on the new MangaDex v5 api with Flutter.
+## Now that mangadex is working pretty well we dont really need this anymore :)
 
-Take a look here: https://dexreader.simonliveshere.com/#/
+Basic MangaDex reader built on the new MangaDex v5 api with Flutter.
 
 Note: Both this app and the api it is built on are pretty buggy and are liable to break without warning.
 
